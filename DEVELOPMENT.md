@@ -6,13 +6,13 @@ WordSage is a versatile text processing. It leverages FastAPI for the web interf
 ## Prerequisites
 To set up the WordSage project for local development, ensure you have the following tools installed on your machine:
 
-**Python**
+-  **Python**
 WordSage requires Python 3.9 or higher with pip or pipx installed. You can download and install the latest version of Python from the [official Python website](https://www.python.org/downloads/).
 
-**Poetry**
+-  **Poetry**
 First, ensure you have Poetry installed. If not, you can install it by following the [official Poetry installation guide](https://python-poetry.org/docs/#installation).
 
-**Docker**
+-  **Docker**
 Docker is required to run Redis for WordSage. You can download and install Docker from the [official Docker website](https://www.docker.com/get-started).
 
 ## Local Development Guide
@@ -75,5 +75,5 @@ curl -X GET "http://127.0.0.1:8000/status/<returned_task_id>"
 
 
 ## Notes
-• Ensure Redis is running before starting the FastAPI application and Celery worker.
-• All environment variables required for the application should be defined in the .env file.
+- Ensure Redis is running before starting the FastAPI application and Celery worker.
+- All environment variables required for the application should be defined in the .env file.
