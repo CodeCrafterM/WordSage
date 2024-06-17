@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "wordsage"
+version = "0.1.0"
+description = ""
+authors = ["Mustafa Saadi <saadim@pm.me>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+celery = {extras = ["redis"], version = "^5.4.0"}
+fastapi = "^0.111.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pylint = "^3.2.3"
+
+[tool.poetry.scripts]
+lint = "pylint:run_pylint"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
