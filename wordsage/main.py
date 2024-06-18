@@ -9,12 +9,13 @@ import socket
 import asyncio
 import zipfile
 from typing import List
-from fastapi import FastAPI, UploadFile, File, BackgroundTasks
+from fastapi import FastAPI, UploadFile, File, BackgroundTasks, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from celery.result import AsyncResult
 from pydantic import BaseModel
+from prometheus_client import Counter, Histogram, Gauge, Summary, generate_latest, CONTENT_TYPE_LATEST
 from wordsage.tasks import reverse_string, process_text_files
 
 app = FastAPI()
@@ -29,6 +30,22 @@ app.add_middleware(
 
 app.mount("/static", StaticFiles(directory="wordsage/static"), name="static")
 
+REQUEST_COUNT = Counter(
+    "wordsage_request_count_total", "App Request Count", ["method", "endpoint"]
+)
+REQUEST_LATENCY = Histogram(
+    "wordsage_request_latency_seconds", "Request latency", ["method", "endpoint"]
+)
+REQUEST_IN_PROGRESS = Gauge(
+    "wordsage_request_in_progress", "Requests in progress", ["method", "endpoint"]
+)
+REQUEST_EXCEPTION = Counter(
+    "wordsage_request_exception_total", "Request Exceptions", ["method", "endpoint"]
+)
+REQUEST_DURATION = Summary(
+    "wordsage_request_duration_seconds", "Request duration", ["method", "endpoint"]
+)
+
 defined_upload_dir = os.getenv('UPLOAD_DIRECTORY', '/wordsage/uploaded_files')
 
 
@@ -40,6 +57,33 @@ class ProcessRequest(BaseModel):
 class ReverseStringRequest(BaseModel):
     """Model for reverse string request."""
     input_string: str
+
+
+@app.middleware("http")
+async def add_prometheus_metrics(request: Request, call_next):
+    """Middleware to add Prometheus metrics."""
+    method = request.method
+    endpoint = request.url.path
+    REQUEST_IN_PROGRESS.labels(method=method, endpoint=endpoint).inc()
+    start_time = time.time()
+
+    try:
+        response = await call_next(request)
+        REQUEST_COUNT.labels(method=method, endpoint=endpoint).inc()
+        REQUEST_LATENCY.labels(method=method, endpoint=endpoint).observe(time.time() - start_time)
+        REQUEST_DURATION.labels(method=method, endpoint=endpoint).observe(time.time() - start_time)
+        return response
+    except Exception as e:
+        REQUEST_EXCEPTION.labels(method=method, endpoint=endpoint).inc()
+        raise e
+    finally:
+        REQUEST_IN_PROGRESS.labels(method=method, endpoint=endpoint).dec()
+
+
+@app.get("/metrics")
+async def metrics():
+    """Metrics endpoint."""
+    return HTMLResponse(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
 @app.get("/health")
