@@ -57,6 +57,12 @@ Start the Celery worker:
 poetry run celery -A wordsage.celery_config worker --loglevel=info
 ```
 
+**Run Flower (Celery Cluster Management & Monitoring)**
+Start the Celery flower instance:
+
+```
+poetry run celery -A wordsage.celery_config flower --port=5555
+```
 
 **Post a Task to Reverse a String**
 To test the setup, you can post a task to reverse a string using curl:
