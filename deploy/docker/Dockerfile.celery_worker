@@ -1,0 +1,29 @@
+# Use an official Python runtime as a parent image
+FROM python:3.12-slim
+
+# Set the working directory in the container
+WORKDIR /wordsage
+
+# Install Poetry
+RUN pip install poetry
+
+# Copy the pyproject.toml and poetry.lock files into the container
+COPY pyproject.toml poetry.lock* /wordsage/
+
+# Install dependencies using Poetry
+RUN poetry config virtualenvs.create false && poetry install --no-root --without fastapi,flower
+
+# Copy only the necessary application code into the container
+COPY wordsage/celery_app.py wordsage/celery_app.py
+COPY wordsage/celery_config.py wordsage/celery_config.py
+COPY wordsage/tasks.py wordsage/tasks.py
+
+# Create a non-root user
+RUN groupadd -r celery && useradd -r -g celery celery
+RUN chown -R celery:celery /wordsage
+
+# Switch to the non-root user
+USER celery
+
+# Run the Celery worker
+CMD ["celery", "-A", "wordsage.celery_config", "worker", "--loglevel=info"]

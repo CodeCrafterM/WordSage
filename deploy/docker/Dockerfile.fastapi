@@ -1,0 +1,30 @@
+# Use an official Python runtime as a parent image
+FROM python:3.12-slim
+
+# Set the working directory in the container
+WORKDIR /wordsage
+
+# Install Poetry
+RUN pip install poetry
+
+# Copy the pyproject.toml and poetry.lock files into the container
+COPY pyproject.toml poetry.lock* /wordsage/
+
+# Install dependencies using Poetry
+RUN poetry config virtualenvs.create false && poetry install --only main,fastapi
+
+# Copy the the application code into the container
+COPY wordsage /wordsage/wordsage
+
+# Create a non-root user
+RUN groupadd -r wordsage && useradd -r -g wordsage wordsage
+RUN mkdir -p /wordsage/uploaded_files && chown -R wordsage:wordsage /wordsage
+
+# Switch to the non-root user
+USER wordsage
+
+# Expose the port FastAPI is running on
+# EXPOSE 8000
+
+# Run the FastAPI server
+CMD ["uvicorn", "wordsage.main:app", "--host", "0.0.0.0", "--port", "8000"]
