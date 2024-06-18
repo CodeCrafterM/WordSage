@@ -68,15 +68,20 @@ poetry run celery -A wordsage.celery_config flower --port=5555
 To test the setup, you can post a task to reverse a string using curl:
 
 ```
-curl -X POST "http://127.0.0.1:8000/reverse/" -H "Content-Type: application/json" -d '{"input_string": "Hello, World!"}'
+curl -X POST "http://127.0.0.1:8000/api/reverse/" -H "Content-Type: application/json" -d '{"input_string": "Hello, World!"}'
 ```
 
+Or post a zip file of articles (in .txt format) to count the common words:
+
+```
+url -X POST "http://127.0.0.1:8000/api/job/" -F "file=@/Users/mustmo/Downloads/exmaple-articles.zip"
+```
 
 **Get the Status/Result of a Task**
 Check the status or result of the task by using the task ID returned from the previous command:
 
 ```
-curl -X GET "http://127.0.0.1:8000/status/<returned_task_id>"
+curl -X GET "http://127.0.0.1:8000/api/status/<returned_task_id>"
 ```
 
 
