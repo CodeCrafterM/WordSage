@@ -1,0 +1,57 @@
+# k8s/grafana-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: wordsage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: grafana-pvc
+              mountPath: /var/lib/grafana
+            - name: grafana-datasource-config
+              mountPath: /etc/grafana/provisioning/datasources
+            - name: grafana-dashboard-config
+              mountPath: /etc/grafana/provisioning/dashboards
+            - name: grafana-dashboard-definitions
+              mountPath: /var/lib/grafana/dashboards
+      volumes:
+        - name: grafana-pvc
+          persistentVolumeClaim:
+            claimName: grafana-pvc
+        - name: grafana-datasource-config
+          configMap:
+            name: grafana-datasource-config
+        - name: grafana-dashboard-config
+          configMap:
+            name: grafana-dashboard-config
+        - name: grafana-dashboard-definitions
+          configMap:
+            name: grafana-dashboard-definitions
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: wordsage
+spec:
+  type: NodePort
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30001
+  selector:
+    app: grafana

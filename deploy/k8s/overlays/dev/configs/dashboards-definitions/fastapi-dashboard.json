@@ -1,0 +1,102 @@
+{
+    "id": null,
+    "title": "FastAPI Metrics",
+    "tags": [],
+    "style": "dark",
+    "timezone": "browser",
+    "editable": true,
+    "panels": [
+      {
+        "type": "graph",
+        "title": "Request Count",
+        "targets": [
+          {
+            "expr": "sum by (method, endpoint) (rate(wordsage_request_count_total[5m]))",
+            "legendFormat": "{{method}} {{endpoint}}",
+            "refId": "A"
+          }
+        ],
+        "datasource": "Prometheus",
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Request Latency",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(wordsage_request_latency_seconds_bucket[5m])) by (le, method, endpoint))",
+            "legendFormat": "p95 latency for {{method}} {{endpoint}}",
+            "refId": "A"
+          }
+        ],
+        "datasource": "Prometheus",
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 8
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Request Duration",
+        "targets": [
+          {
+            "expr": "sum by (endpoint) (rate(wordsage_request_duration_seconds_sum[5m]) / rate(wordsage_request_duration_seconds_count[5m]))",
+            "legendFormat": "{{endpoint}}",
+            "refId": "A"
+          }
+        ],
+        "datasource": "Prometheus",
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 16
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Requests in Progress",
+        "targets": [
+          {
+            "expr": "sum by (endpoint) (wordsage_request_in_progress)",
+            "legendFormat": "{{endpoint}}",
+            "refId": "A"
+          }
+        ],
+        "datasource": "Prometheus",
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 24
+        }
+      },
+      {
+        "type": "graph",
+        "title": "Total Exceptions",
+        "targets": [
+          {
+            "expr": "sum by (endpoint) (rate(wordsage_request_exception_total[5m]))",
+            "legendFormat": "{{endpoint}}",
+            "refId": "A"
+          }
+        ],
+        "datasource": "Prometheus",
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 32
+        }
+      }
+    ],
+    "schemaVersion": 16,
+    "version": 1
+  }

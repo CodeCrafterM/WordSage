@@ -1,0 +1,31 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+configMapGenerator:
+  - name: grafana-dashboard-definitions
+    namespace: wordsage
+    behavior: replace
+    files:
+      - configs/dashboards-definitions/celery-dashboard.json
+      - configs/dashboards-definitions/fastapi-dashboard.json
+      - configs/dashboards-definitions/redis-dashboard.json
+ 
+  - name: grafana-datasource-config
+    namespace: wordsage
+    behavior: replace
+    files:
+      - configs/grafana-datasource.yaml
+
+  - name: grafana-dashboard-config
+    namespace: wordsage
+    behavior: replace
+    files:
+      - configs/grafana-dashboard.yaml
+patches:
+  - target:
+      group: ""
+      version: v1
+      kind: Deployment
+      name: wordsage-fastapi
+    path: patches/wordsage-fastapi-deployment-patch.yaml

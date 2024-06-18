@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordsage-fastapi
+  namespace: wordsage
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: wordsage-fastapi
+  template:
+    metadata:
+      labels:
+        app: wordsage-fastapi
+    spec:
+      containers:
+        - name: fastapi
+          image: wordsage-fastapi:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: wordsage-files
+              mountPath: /wordsage/uploaded_files
+          envFrom:
+            - configMapRef:
+                name: wordsage-config
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: wordsage-files
+          persistentVolumeClaim:
+            claimName: wordsage-files-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordsage-fastapi
+  namespace: wordsage
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      nodePort: 30000
+  selector:
+    app: wordsage-fastapi
