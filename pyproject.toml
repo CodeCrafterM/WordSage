@@ -14,6 +14,8 @@ flower = "^2.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.2.3"
+pytest = "^8.2.2"
+pytest-mock = "^3.14.0"
 
 [tool.poetry.scripts]
 lint = "pylint:run_pylint"
