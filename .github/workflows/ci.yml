@@ -24,5 +24,11 @@ jobs:
         curl -sSL https://install.python-poetry.org | python3 -
         poetry install
 
+    - name: Export environment variable for tests
+      run: echo "UPLOAD_DIRECTORY=wordsage/uploaded_files" >> $GITHUB_ENV
+
+    - name: Run unit tests
+      run: poetry run pytest
+
     - name: Run linter
       run: poetry run pylint wordsage
