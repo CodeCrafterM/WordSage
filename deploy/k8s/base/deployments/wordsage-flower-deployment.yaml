@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordsage-flower
+  namespace: wordsage
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: wordsage-flower
+  template:
+    metadata:
+      labels:
+        app: wordsage-flower
+    spec:
+      containers:
+        - name: flower
+          image: wordsage-flower:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5555
+          env:
+            - name: CELERY_BROKER_URL
+              value: "redis://redis:6379/0"
+            - name: CELERY_RESULT_BACKEND
+              value: "redis://redis:6379/0"
+          command: ["celery", "-A", "wordsage.celery_config", "flower", "--port=5555"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordsage-flower
+  namespace: wordsage
+spec:
+  type: NodePort
+  ports:
+    - port: 5555
+      targetPort: 5555
+      nodePort: 30002
+  selector:
+    app: wordsage-flower

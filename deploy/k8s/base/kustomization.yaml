@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - wordsage-ns.yaml
+  
+  - configmaps/wordsage-configmap.yaml
+  - configmaps/redis-configmap.yaml
+  - configmaps/prometheus-configmap.yaml
+  - configmaps/grafana-datasource-configmap.yaml
+  - configmaps/grafana-dashboard-configmap.yaml
+  - configmaps/grafana-dashboard-definitions-configmap.yaml
+
+  - volumes/wordsage-files-pv-pvc.yaml
+  - volumes/grafana-pv-pvc.yaml
+
+  - deployments/redis-deployment.yaml
+  - deployments/wordsage-celery-worker-deployment.yaml
+  - deployments/wordsage-fastapi-deployment.yaml
+  - deployments/redis-exporter-deployment.yaml
+  - deployments/wordsage-flower-deployment.yaml
+  - deployments/prometheus-deployment.yaml
+  - deployments/grafana-deployment.yaml
