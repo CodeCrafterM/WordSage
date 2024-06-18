@@ -12,8 +12,9 @@ document.getElementById('processButton').addEventListener('click', function () {
 
 document.getElementById('fileInput').addEventListener('change', function () {
     const fileInput = document.getElementById('fileInput');
-    const txtFiles = Array.from(fileInput.files).filter(file => file.name.endsWith('.txt'));
-    
+    const files = Array.from(fileInput.files);
+    const txtFiles = files.filter(file => file.name.endsWith('.txt'));
+
     if (txtFiles.length > 4) {
         alert('You can only select up to 4 text files.');
         fileInput.value = ''; // Clear the input
@@ -22,14 +23,15 @@ document.getElementById('fileInput').addEventListener('change', function () {
 
 async function uploadFiles() {
     const fileInput = document.getElementById('fileInput');
-    const files = Array.from(fileInput.files).filter(file => file.name.endsWith('.txt'));
+    const files = Array.from(fileInput.files);
+    const txtFiles = files.filter(file => file.name.endsWith('.txt'));
 
     if (files.length === 0) {
         alert('Please select a folder of text files.');
         return;
     }
 
-    if (files.length > 4) {
+    if (txtFiles.length > 4) {
         alert('You can only select up to 4 text files.');
         return;
     }
@@ -38,12 +40,14 @@ async function uploadFiles() {
     document.getElementById('processButton').disabled = true;
 
     const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-        formData.append('files', files[i]);
+    if (txtFiles.length > 0 && txtFiles.length <= 4) {
+        for (let i = 0; i < txtFiles.length; i++) {
+            formData.append('files', txtFiles[i]);
+        }
     }
 
     try {
-        const response = await fetch('/upload/', {
+        const response = await fetch('/api/job/', {
             method: 'POST',
             body: formData
         });
@@ -54,32 +58,11 @@ async function uploadFiles() {
         }
 
         const data = await response.json();
-        const folderPath = data.folder_path;
-
-        await startProcessing(folderPath);
-    } catch (error) {
-        console.error('Error uploading files:', error);
-        document.getElementById('loadingIndicator').style.display = 'none';
-        document.getElementById('processButton').disabled = false;
-    }
-}
-
-async function startProcessing(folderPath) {
-    try {
-        const response = await fetch('/process/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ folder_path: folderPath })
-        });
-
-        const data = await response.json();
         const taskId = data.task_id;
 
         checkTaskStatus(taskId);
     } catch (error) {
-        console.error('Error starting processing:', error);
+        console.error('Error uploading files:', error);
         document.getElementById('loadingIndicator').style.display = 'none';
         document.getElementById('processButton').disabled = false;
     }
