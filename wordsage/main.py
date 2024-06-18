@@ -8,7 +8,9 @@ import time
 import socket
 import asyncio
 import zipfile
+from typing import List
 from fastapi import FastAPI, UploadFile, File, BackgroundTasks
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from celery.result import AsyncResult
@@ -25,7 +27,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount("/static", StaticFiles(directory="wordsage/static"), name="static")
+
 defined_upload_dir = os.getenv('UPLOAD_DIRECTORY', '/wordsage/uploaded_files')
+
+
+class ProcessRequest(BaseModel):
+    """Model for processing request."""
+    folder_path: str
+
+
+class ReverseStringRequest(BaseModel):
+    """Model for reverse string request."""
+    input_string: str
+
 
 @app.get("/health")
 async def health_check():
@@ -36,12 +51,44 @@ async def health_check():
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
     """Root endpoint serving HTML."""
-    return HTMLResponse(content="<html><body><h1>Welcome to WordSage</h1></body></html>")
+    with open("wordsage/static/index.html", encoding='utf-8') as f:
+        return HTMLResponse(content=f.read())
 
 
-class ReverseStringRequest(BaseModel):
-    """Model for reverse string request."""
-    input_string: str
+@app.post("/upload/", response_class=JSONResponse)
+async def upload_files(files: List[UploadFile] = File(...)):
+    """Upload files endpoint."""
+    upload_dir = defined_upload_dir
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+
+    timestamp = int(time.time())
+    unique_subdir = os.path.join(upload_dir, str(timestamp))
+    os.makedirs(unique_subdir, exist_ok=True)
+
+    for file in files:
+        file_path = os.path.join(unique_subdir, file.filename)
+        file_dir = os.path.dirname(file_path)
+
+        # Ensure the directory exists
+        if not os.path.exists(file_dir):
+            os.makedirs(file_dir, exist_ok=True)
+
+        print(f"Saving file to {file_path}")  # Debug print statement
+
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+    return {"message": "Files uploaded successfully", "folder_path": unique_subdir}
+
+
+@app.post("/process/")
+async def start_processing(request: ProcessRequest, background_tasks: BackgroundTasks):
+    """Start processing endpoint."""
+    folder_path = request.folder_path
+    task = process_text_files.delay(folder_path)
+    background_tasks.add_task(check_task_status, task.id)
+    return {"task_id": task.id}
 
 
 @app.post("/api/reverse/", response_class=JSONResponse)
