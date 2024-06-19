@@ -16,7 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from celery.result import AsyncResult
 from pydantic import BaseModel
 from prometheus_client import Counter, Histogram, Gauge, Summary, generate_latest, CONTENT_TYPE_LATEST
-from wordsage.tasks import reverse_string, process_text_files
+from wordsage.tasks import reverse_string, process_text_files_v2
 
 app = FastAPI()
 
@@ -46,18 +46,18 @@ REQUEST_DURATION = Summary(
     "wordsage_request_duration_seconds", "Request duration", ["method", "endpoint"]
 )
 
-# Define metrics for /api/v1/job
-REQUEST_COUNT_V1 = Counter(
-    "wordsage_request_count_v1", "Request Count for /api/v1/job", ["method"]
+
+REQUEST_COUNT_V2 = Counter(
+    "wordsage_request_count_v2", "Request Count for /api/v2/job", ["method"]
 )
-REQUEST_LATENCY_V1 = Histogram(
-    "wordsage_request_latency_v1", "Request latency for /api/v1/job", ["method"]
+REQUEST_LATENCY_V2 = Histogram(
+    "wordsage_request_latency_v2", "Request latency for /api/v2/job", ["method"]
 )
-REQUEST_IN_PROGRESS_V1 = Gauge(
-    "wordsage_request_in_progress_v1", "Requests in progress for /api/v1/job", ["method"]
+REQUEST_IN_PROGRESS_V2 = Gauge(
+    "wordsage_request_in_progress_v2", "Requests in progress for /api/v2/job", ["method"]
 )
-REQUEST_EXCEPTION_V1 = Counter(
-    "wordsage_request_exception_v1", "Request exceptions for /api/v1/job", ["method"]
+REQUEST_EXCEPTION_V2 = Counter(
+    "wordsage_request_exception_v2", "Request exceptions for /api/v2/job", ["method"]
 )
 
 defined_upload_dir = os.getenv('UPLOAD_DIRECTORY', 'wordsage/uploaded_files')
@@ -121,7 +121,7 @@ async def handle_file_uploads(
     files: List[UploadFile] = None,
     file: UploadFile = None,
     folder_path: str = None,
-    process_task=process_text_files
+    process_task=process_text_files_v2
 ):
     """Reusable function to handle file uploads and processing."""
     upload_dir = defined_upload_dir
@@ -202,22 +202,22 @@ async def api_start_job(
     file: UploadFile = File(None),
     folder_path: str = Form(None)
 ):
-    """API endpoint to upload a folder as a ZIP file or provide a folder path and start a job (Version 1)."""
-    REQUEST_IN_PROGRESS_V1.labels(method="POST").inc()
+    """API endpoint to upload a folder as a ZIP file or provide a folder path and start a job (Version 2)."""
+    REQUEST_IN_PROGRESS_V2.labels(method="POST").inc()
     start_time = time.time()
 
     try:
         response = await handle_file_uploads(
-            background_tasks, files=files, file=file, folder_path=folder_path, process_task=process_text_files
+            background_tasks, files=files, file=file, folder_path=folder_path, process_task=process_text_files_v2
         )
-        REQUEST_COUNT_V1.labels(method="POST").inc()
-        REQUEST_LATENCY_V1.labels(method="POST").observe(time.time() - start_time)
+        REQUEST_COUNT_V2.labels(method="POST").inc()
+        REQUEST_LATENCY_V2.labels(method="POST").observe(time.time() - start_time)
         return response
     except Exception as e:
-        REQUEST_EXCEPTION_V1.labels(method="POST").inc()
+        REQUEST_EXCEPTION_V2.labels(method="POST").inc()
         raise e
     finally:
-        REQUEST_IN_PROGRESS_V1.labels(method="POST").dec()
+        REQUEST_IN_PROGRESS_V2.labels(method="POST").dec()
 
 
 @app.get("/api/job/{task_id}", response_class=JSONResponse)

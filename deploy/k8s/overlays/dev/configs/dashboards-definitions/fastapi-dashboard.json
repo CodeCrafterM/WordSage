@@ -1,102 +1,194 @@
 {
-    "id": null,
-    "title": "FastAPI Metrics",
-    "tags": [],
-    "style": "dark",
-    "timezone": "browser",
-    "editable": true,
-    "panels": [
-      {
-        "type": "graph",
-        "title": "Request Count",
-        "targets": [
-          {
-            "expr": "sum by (method, endpoint) (rate(wordsage_request_count_total[5m]))",
-            "legendFormat": "{{method}} {{endpoint}}",
-            "refId": "A"
-          }
-        ],
-        "datasource": "Prometheus",
-        "gridPos": {
-          "h": 8,
-          "w": 24,
-          "x": 0,
-          "y": 0
+  "id": null,
+  "title": "WordSage/FastAPI Metrics",
+  "tags": [],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Request Count",
+      "targets": [
+        {
+          "expr": "sum by (method, endpoint) (rate(wordsage_request_count_total[5m]))",
+          "legendFormat": "{{method}} {{endpoint}}",
+          "refId": "A"
         }
-      },
-      {
-        "type": "graph",
-        "title": "Request Latency",
-        "targets": [
-          {
-            "expr": "histogram_quantile(0.95, sum(rate(wordsage_request_latency_seconds_bucket[5m])) by (le, method, endpoint))",
-            "legendFormat": "p95 latency for {{method}} {{endpoint}}",
-            "refId": "A"
-          }
-        ],
-        "datasource": "Prometheus",
-        "gridPos": {
-          "h": 8,
-          "w": 24,
-          "x": 0,
-          "y": 8
-        }
-      },
-      {
-        "type": "graph",
-        "title": "Request Duration",
-        "targets": [
-          {
-            "expr": "sum by (endpoint) (rate(wordsage_request_duration_seconds_sum[5m]) / rate(wordsage_request_duration_seconds_count[5m]))",
-            "legendFormat": "{{endpoint}}",
-            "refId": "A"
-          }
-        ],
-        "datasource": "Prometheus",
-        "gridPos": {
-          "h": 8,
-          "w": 24,
-          "x": 0,
-          "y": 16
-        }
-      },
-      {
-        "type": "graph",
-        "title": "Requests in Progress",
-        "targets": [
-          {
-            "expr": "sum by (endpoint) (wordsage_request_in_progress)",
-            "legendFormat": "{{endpoint}}",
-            "refId": "A"
-          }
-        ],
-        "datasource": "Prometheus",
-        "gridPos": {
-          "h": 8,
-          "w": 24,
-          "x": 0,
-          "y": 24
-        }
-      },
-      {
-        "type": "graph",
-        "title": "Total Exceptions",
-        "targets": [
-          {
-            "expr": "sum by (endpoint) (rate(wordsage_request_exception_total[5m]))",
-            "legendFormat": "{{endpoint}}",
-            "refId": "A"
-          }
-        ],
-        "datasource": "Prometheus",
-        "gridPos": {
-          "h": 8,
-          "w": 24,
-          "x": 0,
-          "y": 32
-        }
+      ],
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 0
       }
-    ],
-    "schemaVersion": 16,
-    "version": 1
-  }
+    },
+    {
+      "type": "graph",
+      "title": "Request Latency",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(wordsage_request_latency_seconds_bucket[5m])) by (le, method, endpoint))",
+          "legendFormat": "p95 latency for {{method}} {{endpoint}}",
+          "refId": "A"
+        }
+      ],
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Request Duration",
+      "targets": [
+        {
+          "expr": "sum by (endpoint) (rate(wordsage_request_duration_seconds_sum[5m]) / rate(wordsage_request_duration_seconds_count[5m]))",
+          "legendFormat": "{{endpoint}}",
+          "refId": "A"
+        }
+      ],
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Requests in Progress",
+      "targets": [
+        {
+          "expr": "sum by (endpoint) (wordsage_request_in_progress)",
+          "legendFormat": "{{endpoint}}",
+          "refId": "A"
+        }
+      ],
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Total Exceptions",
+      "targets": [
+        {
+          "expr": "sum by (endpoint) (rate(wordsage_request_exception_total[5m]))",
+          "legendFormat": "{{endpoint}}",
+          "refId": "A"
+        }
+      ],
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Request Count Comparison (v1 vs v2)",
+      "targets": [
+        {
+          "expr": "sum by (method) (rate(wordsage_request_count_v1_total[5m]))",
+          "legendFormat": "v1 {{method}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (method) (rate(wordsage_request_count_v2_total[5m]))",
+          "legendFormat": "v2 {{method}}",
+          "refId": "B"
+        }
+      ],
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 40
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Request Latency Comparison (v1 vs v2)",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(wordsage_request_latency_v1_bucket[5m])) by (le, method))",
+          "legendFormat": "v1 p95 latency for {{method}}",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(wordsage_request_latency_v2_bucket[5m])) by (le, method))",
+          "legendFormat": "v2 p95 latency for {{method}}",
+          "refId": "B"
+        }
+      ],
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 48
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Requests in Progress Comparison (v1 vs v2)",
+      "targets": [
+        {
+          "expr": "sum by (method) (wordsage_request_in_progress_v1)",
+          "legendFormat": "v1 {{method}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (method) (wordsage_request_in_progress_v2)",
+          "legendFormat": "v2 {{method}}",
+          "refId": "B"
+        }
+      ],
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 56
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Total Exceptions Comparison (v1 vs v2)",
+      "targets": [
+        {
+          "expr": "sum by (method) (rate(wordsage_request_exception_v1[5m]))",
+          "legendFormat": "v1 {{method}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (method) (rate(wordsage_request_exception_v2[5m]))",
+          "legendFormat": "v2 {{method}}",
+          "refId": "B"
+        }
+      ],
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 64
+      }
+    }
+  ],
+  "schemaVersion": 16,
+  "version": 1
+}

@@ -15,7 +15,7 @@ RUN poetry config virtualenvs.create false && poetry install --only main,fastapi
 
 # Copy the the application code into the container
 COPY wordsage /wordsage/wordsage
-RUN rm /wordsage/wordsage/main_v2.py
+RUN rm /wordsage/wordsage/main.py
 
 # Create a non-root user
 RUN groupadd -r wordsage && useradd -r -g wordsage wordsage
@@ -28,4 +28,4 @@ USER wordsage
 # EXPOSE 8000
 
 # Run the FastAPI server
-CMD ["uvicorn", "wordsage.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "wordsage.main_v2:app", "--host", "0.0.0.0", "--port", "8000"]

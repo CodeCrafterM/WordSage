@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordsage-fastapi
+  namespace: wordsage
+  labels:
+    app: wordsage-fastapi
+spec:
+  ports:
+  - port: 8000
+    name: http
+  selector:
+    app: wordsage-fastapi

@@ -1,0 +1,71 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wordsage-ingress
+  namespace: wordsage
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: wordsage.local
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/api/v1/job(/|$)(.*)"
+            backend:
+              service:
+                name: wordsage-fastapi
+                port:
+                  number: 8000
+          - pathType: Prefix
+            path: "/api/v2/job(/|$)(.*)"
+            backend:
+              service:
+                name: wordsage-fastapi-v2
+                port:
+                  number: 8000
+          - pathType: Prefix
+            path: "/health"
+            backend:
+              service:
+                name: wordsage-fastapi
+                port:
+                  number: 8000
+          - pathType: Prefix
+            path: "/api/reverse"
+            backend:
+              service:
+                name: wordsage-fastapi
+                port:
+                  number: 8000
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: wordsage-fastapi
+                port:
+                  number: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wordsage-ingress-canary
+  namespace: wordsage
+  annotations:
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: "50"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: wordsage.local
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/api/job(/|$)(.*)"
+            backend:
+              service:
+                name: wordsage-fastapi-v2
+                port:
+                  number: 8000

@@ -27,5 +27,5 @@ patches:
       group: ""
       version: v1
       kind: Deployment
-      name: wordsage-fastapi
+      name: wordsage-fastapi-v1
     path: patches/wordsage-fastapi-deployment-patch.yaml
