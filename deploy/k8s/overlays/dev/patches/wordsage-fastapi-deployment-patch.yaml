@@ -9,5 +9,5 @@ spec:
     spec:
       containers:
         - name: fastapi
-          image: wordsage-fastapi:latest
-          imagePullPolicy: Never
+          #image: wordsage-fastapi:latest
+          #imagePullPolicy: Never
