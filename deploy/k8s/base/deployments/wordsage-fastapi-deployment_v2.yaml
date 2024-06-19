@@ -22,8 +22,8 @@ spec:
     spec:
       containers:
         - name: fastapi
-          image: wordsage-fastapi-v2:latest
-          imagePullPolicy: Never
+          image: codecrafterm/wordsage-fastapi-v2:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
           volumeMounts:

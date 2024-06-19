@@ -20,8 +20,8 @@ spec:
     spec:
       containers:
         - name: flower
-          image: wordsage-flower:latest
-          imagePullPolicy: Never
+          image: codecrafterm/wordsage-flower:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5555
           env:

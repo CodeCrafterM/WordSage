@@ -67,6 +67,8 @@ Ensure you have the following tools installed on your machine:
     minikube image load wordsage-flower:latest
     ```
 
+    ***Note for Step 1 & 5***: If you want to develop locally and load the images into Minikube, create patches for the deployments in order to override the image and imagePullPolicy attributes. Example for FastAPI deployment in overlays/dev/patches folder.
+
 6. **Install Istio:**
     ```bash
     curl -L https://istio.io/downloadIstio | sh -

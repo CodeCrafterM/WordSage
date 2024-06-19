@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: fastapi
-          image: wordsage-fastapi:latest
+          image: codecrafterm/wordsage-fastapi:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
