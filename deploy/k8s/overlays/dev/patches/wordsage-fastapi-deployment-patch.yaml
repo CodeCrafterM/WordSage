@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wordsage-fastapi
+  name: wordsage-fastapi-v1
   namespace: wordsage
 spec:
   replicas: 1

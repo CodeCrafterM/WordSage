@@ -15,6 +15,7 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - UPLOAD_DIRECTORY=/wordsage/uploaded_files
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
       interval: 30s
@@ -33,6 +34,7 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - UPLOAD_DIRECTORY=/wordsage/uploaded_files
     healthcheck:
       test: ["CMD-SHELL", "pgrep celery || exit 1"]
       interval: 30s

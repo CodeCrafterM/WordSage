@@ -16,7 +16,13 @@ resources:
   - deployments/redis-deployment.yaml
   - deployments/wordsage-celery-worker-deployment.yaml
   - deployments/wordsage-fastapi-deployment.yaml
+  - deployments/wordsage-fastapi-deployment_v2.yaml
   - deployments/redis-exporter-deployment.yaml
   - deployments/wordsage-flower-deployment.yaml
   - deployments/prometheus-deployment.yaml
   - deployments/grafana-deployment.yaml
+
+  - services/wordsage-fastapi-service.yaml
+
+  - ingresses/wordsage-fastapi-istio-ingress.yaml
+  # - ingresses/wordsage-fastapi-nginx-ingress-canary.yaml

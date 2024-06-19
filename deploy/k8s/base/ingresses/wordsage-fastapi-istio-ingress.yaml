@@ -1,0 +1,88 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: wordsage-gateway
+  namespace: wordsage
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "wordsage.local"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: wordsage-fastapi
+  namespace: wordsage
+spec:
+  host: wordsage-fastapi.wordsage.svc.cluster.local
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: wordsage-fastapi
+  namespace: wordsage
+spec:
+  hosts:
+  - "wordsage.local"
+  gateways:
+  - wordsage-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/api/job"
+      method:
+        exact: "POST"
+    route:
+    - destination:
+        host: wordsage-fastapi.wordsage.svc.cluster.local
+        subset: v1
+      weight: 50
+    - destination:
+        host: wordsage-fastapi.wordsage.svc.cluster.local
+        subset: v2
+      weight: 50
+  - match:
+    - uri:
+        regex: "/api/job/.*"
+      method:
+        exact: "GET"
+    route:
+    - destination:
+        host: wordsage-fastapi.wordsage.svc.cluster.local
+        subset: v1
+      weight: 50
+    - destination:
+        host: wordsage-fastapi.wordsage.svc.cluster.local
+        subset: v2
+      weight: 50
+  - match:
+    - uri:
+        prefix: "/health"
+    route:
+    - destination:
+        host: wordsage-fastapi.wordsage.svc.cluster.local
+  - match:
+    - uri:
+        prefix: "/api/reverse"
+    route:
+    - destination:
+        host: wordsage-fastapi.wordsage.svc.cluster.local
+  - match:
+    - uri:
+        prefix: "/"
+    route:
+    - destination:
+        host: wordsage-fastapi.wordsage.svc.cluster.local
