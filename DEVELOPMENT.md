@@ -1,5 +1,5 @@
 
-# WordSage
+# WordSage Development Guide
 
 WordSage is a versatile text processing. It leverages FastAPI for the web interface, Celery for task queue management, and Redis as a message broker and backend for task result storage. The primary feature of WordSage is to perform text operations, such as reversing a string, in an asynchronous manner.
 
@@ -50,6 +50,12 @@ Launch the FastAPI application:
 poetry run uvicorn wordsage.main:app --reload
 ```
 
+or using the second algorithm:
+
+```
+poetry run uvicorn wordsage.main_v2:app --reload
+```
+
 **Run Celery Worker**
 Start the Celery worker:
 
@@ -84,6 +90,24 @@ Check the status or result of the task by using the task ID returned from the pr
 curl -X GET "http://127.0.0.1:8000/api/status/<returned_task_id>"
 ```
 
+**Running Unit Tests**
+To ensure the quality of the code, you can run the unit tests using the following command:
+
+```
+poetry run pytest
+```
+
+This will execute all the unit tests defined in the project and provide a summary of the results.
+
+
+**Running the Linter**
+To maintain code quality and consistency, you can run the linter using the following command:
+
+```
+poetry run lint wordsage
+```
+
+This will check the code for any linting errors and provide feedback on potential improvements.
 
 ## Notes
 - Ensure Redis is running before starting the FastAPI application and Celery worker.
